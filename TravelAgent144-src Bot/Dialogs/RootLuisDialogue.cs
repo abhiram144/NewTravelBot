@@ -33,6 +33,8 @@ namespace LuisBot.Dialogs
 
         public const string TravelType = "Travel Type";
 
+        public const string WeatherCity = "city";
+
         private static readonly ILog Log =
               LogManager.GetLogger(System.Reflection.MethodBase.GetCurrentMethod().DeclaringType);
 
@@ -173,6 +175,33 @@ namespace LuisBot.Dialogs
             var entityResult = UnWrapEntities(context, activity, result).Result;
         }
 
+        [LuisIntent("Weather.GetCondition")]
+        [LuisIntent("Weather.GetForecast")]
+        //[LuisIntent("")]
+        public async Task WeatherCondition(IDialogContext context, IAwaitable<IMessageActivity> activity, LuisResult result)
+        {
+            var message = await activity;
+            await context.PostAsync($"Welcome to the weather Predictor! We are analyzing your message: '{message.Text}'...");
+            //var entityResult = UnWrapEntities(context, activity, result).Result;
+            EntityRecommendation weatherCityEntity;
+            EntityRecommendation weatherDateEntity;
+
+            if (result.TryFindEntity(WeatherCity, out weatherCityEntity))
+            {
+                SimpleEchoBot.Helpers.WeatherHelper helper = new SimpleEchoBot.Helpers.WeatherHelper();
+                var city = weatherCityEntity.Entity;
+                helper.GetForecastWeatherData("Hyderabad");
+                //bookingInfo.TravelType = travelEntityTravelType.Entity;
+            }
+
+
+            if (result.TryFindEntity(FromLocation, out weatherDateEntity))
+            {
+                //bookingInfo.FromLocation = travelEntityFromLocation.Entity;
+            }
+
+        }
+
         public static string ToAbsoluteUrl(string relativeUrl)
         {
             try
@@ -224,7 +253,7 @@ namespace LuisBot.Dialogs
                 resultMessage.Attachments = new List<Attachment>();
                 var nonAcURL = "";//ToAbsoluteUrl("/Images/Non AC bus.jpg");
                 var acUrl = ""; ToAbsoluteUrl("/Images/AC bus.jpg");
-                foreach (var busOrFlight in bussesAndFlights.data.onwardflights.OrderByDescending(x => x.depdate))
+                foreach (var busOrFlight in bussesAndFlights.data.onwardflights.OrderByDescending(x => x.depdate).Take(5))
                 {
                     var routeType = busOrFlight.RouteSeatTypeDetail.list.FirstOrDefault();
                     HeroCard heroCard = new HeroCard()
@@ -232,10 +261,10 @@ namespace LuisBot.Dialogs
                         Title = busOrFlight.TravelsName,
                         Subtitle = $"{busOrFlight.BusType} starts at {busOrFlight.DepartureTime} to {busOrFlight.destination}  @{busOrFlight.fare.totalfare}",
                         Text = $"Departs on {busOrFlight.depdate} at {busOrFlight.DepartureTime} Origin - {busOrFlight.origin} service number - {busOrFlight.BusServiceID} reaches {busOrFlight.destination} at {busOrFlight.arrdate} ",
-                        Images = new List<CardImage>()
-                        {
-                            new CardImage() { Url = routeType == null ? nonAcURL : (routeType.busCondition.Contains("nonac") ? nonAcURL : acUrl) }
-                        },
+                        //Images = new List<CardImage>()
+                        //{
+                        //    new CardImage() { Url = routeType == null ? nonAcURL : (routeType.busCondition.Contains("nonac") ? nonAcURL : acUrl) }
+                        //},
                         Buttons = new List<CardAction>()
                         {
                             new CardAction()
