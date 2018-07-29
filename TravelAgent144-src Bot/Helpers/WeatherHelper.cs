@@ -17,8 +17,9 @@ namespace SimpleEchoBot.Helpers
             this.appId = ConfigurationManager.AppSettings["openMapWeatherAppId"] as string;
             this.webApiUri = ConfigurationManager.AppSettings["openMapWeatherApi"] as string;
         }
-        public void GetWeatherData(string location)
+        public Data_Models.Weather.Current.WeatherApiModel GetWeatherData(string location)
         {
+            Data_Models.Weather.Current.WeatherApiModel weatherCurrentApiModel = new Data_Models.Weather.Current.WeatherApiModel();
             var url = BusinessConstants.WeatherApi;
             url = string.Format(url, location, appId);
             var serviceAgent = new WebApiClient(webApiUri, appId, "");
@@ -28,12 +29,14 @@ namespace SimpleEchoBot.Helpers
                 if (result.IsSuccessStatusCode)
                 {
                     var jsonResponse = result.Content.ReadAsStringAsync().Result;
-                    var weather = JsonConvert.DeserializeObject<Data_Models.Weather.WeatherApiModel>(jsonResponse);
+                    weatherCurrentApiModel = JsonConvert.DeserializeObject<Data_Models.Weather.Current.WeatherApiModel>(jsonResponse);
                 }
             }
+            return weatherCurrentApiModel;
         }
-        public void GetForecastWeatherData(string location)
+        public Data_Models.Weather.WeatherForecastApiModel GetForecastWeatherData(string location)
         {
+            Data_Models.Weather.WeatherForecastApiModel weatherForecastApiModel = new Data_Models.Weather.WeatherForecastApiModel();
             var url = BusinessConstants.WeatherForecastApi;
             url = string.Format(url, location, appId);
             var serviceAgent = new WebApiClient(webApiUri, appId, "");
@@ -43,9 +46,10 @@ namespace SimpleEchoBot.Helpers
                 if (result.IsSuccessStatusCode)
                 {
                     var jsonResponse = result.Content.ReadAsStringAsync().Result;
-                    var weather = JsonConvert.DeserializeObject<Data_Models.Weather.WeatherForecastApiModel>(jsonResponse);
+                    weatherForecastApiModel = JsonConvert.DeserializeObject<Data_Models.Weather.WeatherForecastApiModel>(jsonResponse);
                 }
             }
+            return weatherForecastApiModel;
         }
     }
 }

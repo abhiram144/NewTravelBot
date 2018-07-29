@@ -14,6 +14,7 @@ namespace LuisBot.Dialogs
     using Travel_Website.Repository;
     using Chronic;
     using log4net;
+    using SimpleEchoBot.Helpers;
 
     [LuisModel("16816e8d-34d5-4eb4-b2ae-c1c1590d98ba", "d8c7c7db62134d9db0359a9845fb6d8c")]
     //[LuisModel("4bd9e4fa-8d7d-4b52-b968-43a2dd995cdd", "ff0cc11d49a14688844b74873bb9a97c")]
@@ -186,20 +187,65 @@ namespace LuisBot.Dialogs
             EntityRecommendation weatherCityEntity;
             EntityRecommendation weatherDateEntity;
 
+            string city = string.Empty;
+
+            SimpleEchoBot.Helpers.WeatherHelper helper = new SimpleEchoBot.Helpers.WeatherHelper();
+
             if (result.TryFindEntity(WeatherCity, out weatherCityEntity))
             {
-                SimpleEchoBot.Helpers.WeatherHelper helper = new SimpleEchoBot.Helpers.WeatherHelper();
-                var city = weatherCityEntity.Entity;
-                helper.GetForecastWeatherData("Hyderabad");
+                city = weatherCityEntity.Entity;
                 //bookingInfo.TravelType = travelEntityTravelType.Entity;
             }
 
+            city = string.IsNullOrEmpty(city) ? "Hyderabad" : city;
+
+            var weatherForecast = helper.GetForecastWeatherData(city);
 
             if (result.TryFindEntity(FromLocation, out weatherDateEntity))
             {
                 //bookingInfo.FromLocation = travelEntityFromLocation.Entity;
             }
+            await context.PostAsync($"Please wait while I make some quick calls to authorities ");
+            var resultMessage = context.MakeMessage();
+            resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
+            resultMessage.Attachments = new List<Attachment>();
+            List<DateTime> datesAdded = new List<DateTime>();
+            foreach (var weatherDay in weatherForecast.list)
+            {
+                var currentDateTime = Convert.ToDateTime(weatherDay.dt_txt);
+                if (!datesAdded.Contains(currentDateTime) && DateTime.Now > currentDateTime && datesAdded.Count <= 4)
+                {
+                    var weatherDetails = weatherDay.weather.First();
+                    HeroCard heroCard = new HeroCard()
+                    {
+                        Title =  weatherDetails.main + " " + PrettyDateHelper.GetPrettyDate(currentDateTime),
+                        Subtitle = $"{weatherDetails.description}",
+                        Text = $"On {weatherDay.dt_txt} at {city} Max Temperature - {weatherDay.main.temp_max} Min Temperature - {weatherDay.main.temp_min} Mostly {weatherDetails.main}",
+                        //Images = new List<CardImage>()
+                        //{
+                        //    new CardImage() { Url = routeType == null ? nonAcURL : (routeType.busCondition.Contains("nonac") ? nonAcURL : acUrl) }
+                        //},
+                        //Buttons = new List<CardAction>()
+                        //    {
+                        //        new CardAction()
+                        //        {
+                        //            Title = "Book Now",
+                        //            Type = ActionTypes.OpenUrl,
+                        //            Value = $"https://www.google.com"
+                        //        }
+                        //    }
+                    };
+                    resultMessage.Attachments.Add(heroCard.ToAttachment());
+                }
+                datesAdded.Add(currentDateTime);
+                //await context.PostAsync(response);
+            }
+            await context.PostAsync(resultMessage);
+        }
 
+        public string KelvinToCentigrade(float kelvin)
+        {
+            return kelvin - 272.15 + "C";
         }
 
         public static string ToAbsoluteUrl(string relativeUrl)
@@ -251,8 +297,8 @@ namespace LuisBot.Dialogs
                 var resultMessage = context.MakeMessage();
                 resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 resultMessage.Attachments = new List<Attachment>();
-                var nonAcURL = "";//ToAbsoluteUrl("/Images/Non AC bus.jpg");
-                var acUrl = ""; ToAbsoluteUrl("/Images/AC bus.jpg");
+                //var nonAcURL = "";//ToAbsoluteUrl("/Images/Non AC bus.jpg");
+                //var acUrl = ""; ToAbsoluteUrl("/Images/AC bus.jpg");
                 foreach (var busOrFlight in bussesAndFlights.data.onwardflights.OrderByDescending(x => x.depdate).Take(5))
                 {
                     var routeType = busOrFlight.RouteSeatTypeDetail.list.FirstOrDefault();

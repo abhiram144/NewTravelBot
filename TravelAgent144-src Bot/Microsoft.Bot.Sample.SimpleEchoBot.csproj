@@ -209,6 +209,7 @@
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Helpers\GoibiboHelper.cs" />
+    <Compile Include="Helpers\PrettyDateHelper.cs" />
     <Compile Include="Helpers\WeatherHelper.cs" />
     <Compile Include="Models\TravelBooking.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
