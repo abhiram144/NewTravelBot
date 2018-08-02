@@ -328,7 +328,7 @@ namespace LuisBot.Dialogs
                         {
                             new CardAction()
                             {
-                                Title = "Book Now",
+                                Title = $"Rs . {busOrFlight.fare.totalfare}",
                                 Type = ActionTypes.OpenUrl,
                                 Value = $"https://www.google.com"
                             }
