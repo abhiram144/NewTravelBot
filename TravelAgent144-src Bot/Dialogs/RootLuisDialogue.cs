@@ -54,7 +54,7 @@ namespace LuisBot.Dialogs
             var travelFormDialog = new FormDialog<TravelBooking>(bookingInfo, this.BuildTravelsForm, FormOptions.PromptInStart, result.Entities);
             //if (!IsDataValid(bookingInfo))
             //    context.Post()
-                context.Call(travelFormDialog, this.ResumeAfterTravelFormDialog);
+            context.Call(travelFormDialog, this.ResumeAfterTravelFormDialog);
             return bookingInfo;
         }
 
@@ -143,7 +143,7 @@ namespace LuisBot.Dialogs
             }
 
             //while(!IsDataValid(bookingInfo))
-                await PromptUserForData(context, activity, result, bookingInfo);
+            await PromptUserForData(context, activity, result, bookingInfo);
             //var hotelsQuery = new HotelsQuery();
 
             //EntityRecommendation cityEntityRecommendation;
@@ -218,7 +218,7 @@ namespace LuisBot.Dialogs
                     var weatherDetails = weatherDay.weather.First();
                     HeroCard heroCard = new HeroCard()
                     {
-                        Title =  weatherDetails.main + " " + PrettyDateHelper.GetPrettyDate(currentDateTime),
+                        Title = weatherDetails.main + " " + PrettyDateHelper.GetPrettyDate(currentDateTime),
                         Subtitle = $"{weatherDetails.description}",
                         Text = $"On {weatherDay.dt_txt} at {city} Max Temperature - {weatherDay.main.temp_max} Min Temperature - {weatherDay.main.temp_min} Mostly {weatherDetails.main}",
                         //Images = new List<CardImage>()
@@ -269,7 +269,7 @@ namespace LuisBot.Dialogs
                 return String.Format("{0}://{1}{2}{3}",
                     url.Scheme, url.Host, port, VirtualPathUtility.ToAbsolute(relativeUrl));
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
                 return relativeUrl;
             }
@@ -294,12 +294,25 @@ namespace LuisBot.Dialogs
                 await context.PostAsync($"Sorry I cant find any {travelInfo.TravelType} from {travelInfo.FromLocation} to {travelInfo.ToLocation}");
             else
             {
+                var busResultAfterSortingLogic = bussesAndFlights.data.onwardflights.AsEnumerable();
+                if (!string.IsNullOrEmpty(travelInfo.Class))
+                {
+                    if (travelInfo.Class.ToLower().Contains("fast"))
+                    {
+                        busResultAfterSortingLogic = bussesAndFlights.data.onwardflights.OrderBy(x => x.arrdate - x.depdate);
+                    }
+                    else if (travelInfo.Class.ToLower().Contains("cheap"))
+                    {
+                        busResultAfterSortingLogic = bussesAndFlights.data.onwardflights.OrderBy(x => x.fare.totalfare);
+                    }
+                }
+
                 var resultMessage = context.MakeMessage();
                 resultMessage.AttachmentLayout = AttachmentLayoutTypes.Carousel;
                 resultMessage.Attachments = new List<Attachment>();
                 //var nonAcURL = "";//ToAbsoluteUrl("/Images/Non AC bus.jpg");
                 //var acUrl = ""; ToAbsoluteUrl("/Images/AC bus.jpg");
-                foreach (var busOrFlight in bussesAndFlights.data.onwardflights.OrderByDescending(x => x.depdate).Take(5))
+                foreach (var busOrFlight in busResultAfterSortingLogic.Take(5))
                 {
                     var routeType = busOrFlight.RouteSeatTypeDetail.list.FirstOrDefault();
                     HeroCard heroCard = new HeroCard()
