@@ -306,7 +306,7 @@ namespace LuisBot.Dialogs
                     {
                         Title = busOrFlight.TravelsName,
                         Subtitle = $"{busOrFlight.BusType} starts at {busOrFlight.DepartureTime} to {busOrFlight.destination}  @Rs . {busOrFlight.fare.totalfare} ",
-                        Text = $"Departs on {busOrFlight.depdate} at {busOrFlight.DepartureTime} Origin - {busOrFlight.origin} service number - {busOrFlight.BusServiceID} reaches {busOrFlight.destination} at {busOrFlight.arrdate} ",
+                        Text = $"Departs on {busOrFlight.depdate} at {busOrFlight.DepartureTime} Origin - {busOrFlight.origin} service number - {busOrFlight.BusServiceID} reaches {busOrFlight.destination} at {busOrFlight.arrdate} @Rs . {busOrFlight.fare.totalfare}",
                         //Images = new List<CardImage>()
                         //{
                         //    new CardImage() { Url = routeType == null ? nonAcURL : (routeType.busCondition.Contains("nonac") ? nonAcURL : acUrl) }
@@ -392,7 +392,7 @@ namespace LuisBot.Dialogs
         [LuisIntent("OnDevice.Help")]
         public async Task Help(IDialogContext context, LuisResult result)
         {
-            await context.PostAsync("Hi I am currently learning on how to become a travel assistant ..... I am still very young and trying my best ... I am here to help! Try asking me things like 'Busses from Hyderabad to Banglore', 'Flights to delhi' or 'weather in Bombay'");
+            await context.PostAsync("Hi I am currently learning on how to become a travel assistant ..... I am still very young and trying my best ... I am here to help! Try asking me things like 'Busses from Hyderabad to Banglore',  'weather in Bombay'");
 
             context.Wait(this.MessageReceived);
         }

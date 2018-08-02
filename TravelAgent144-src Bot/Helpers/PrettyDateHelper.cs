@@ -42,7 +42,7 @@ namespace SimpleEchoBot.Helpers
                 // Less than 2 minutes ago.
                 if (secDiff < 120)
                 {
-                    return "1 minute ago";
+                    return "In Few Moments";
                 }
                 if (secDiff > 120 && secDiff < 3599)
                 {
@@ -52,7 +52,7 @@ namespace SimpleEchoBot.Helpers
                 // Less than one hour ago.
                 if (secDiff < 3600)
                 {
-                    return string.Format("{0} minutes ago",
+                    return string.Format("After {0} Minutes",
                         Math.Floor((double)secDiff / 60));
                 }
                 if (secDiff > 3600 && secDiff < 7199)
@@ -64,11 +64,11 @@ namespace SimpleEchoBot.Helpers
                 // Less than 2 hours ago.
                 if (secDiff < 7200)
                 {
-                    return "1 hour ago";
+                    return "In Few Hours";
                 }
                 if (secDiff > 7200 && secDiff < 86399)
                 {
-                    return "1 hour ago";
+                    return "After few Hours";
                 }
                 // E.
                 // Less than one day ago.
