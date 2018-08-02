@@ -305,7 +305,7 @@ namespace LuisBot.Dialogs
                     HeroCard heroCard = new HeroCard()
                     {
                         Title = busOrFlight.TravelsName,
-                        Subtitle = $"{busOrFlight.BusType} starts at {busOrFlight.DepartureTime} to {busOrFlight.destination}  @{busOrFlight.fare.totalfare}",
+                        Subtitle = $"{busOrFlight.BusType} starts at {busOrFlight.DepartureTime} to {busOrFlight.destination}  @Rs . {busOrFlight.fare.totalfare} ",
                         Text = $"Departs on {busOrFlight.depdate} at {busOrFlight.DepartureTime} Origin - {busOrFlight.origin} service number - {busOrFlight.BusServiceID} reaches {busOrFlight.destination} at {busOrFlight.arrdate} ",
                         //Images = new List<CardImage>()
                         //{
